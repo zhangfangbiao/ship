@@ -8,18 +8,21 @@ TG学习交流群：https://t.me/cdles
 const $ = new Env("愤怒的锦鲤")
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random()*4+10)}.${Math.ceil(Math.random()*4)};${randomString(40)}`
-var kois = process.env.kois ?? ""
 let cookiesArr = []
 var helps = [];
 var tools= []
 !(async () => {
-    if(!kois){
-        console.log("请在环境变量中填写需要助力的账号")
-    }
     requireConfig()
+    var kois = process.env.kois
+    if(!kois){
+        console.log("未设置环境变量kois，默认助力所有账号")
+        kois = cookiesArr.join('&')
+    }
     for (let i in cookiesArr) {
-        cookie = cookiesArr[i]
-        if(kois.indexOf(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])!=-1){
+        const cookie = cookiesArr[i]
+        const pin = cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]
+        console.log(pin)
+        if(kois.indexOf(pin) != -1){
             var data = await requestApi('h5launch',cookie);
             switch (data?.data?.result?.status) {
                 case 1://火爆
@@ -103,22 +106,19 @@ function requestApi(functionId, cookie, body = {}) {
 }
 
 function requireConfig() {
-    return new Promise(resolve => {
-        notify = $.isNode() ? require('./sendNotify') : '';
-        const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-        if ($.isNode()) {
-            Object.keys(jdCookieNode).forEach((item) => {
-                if (jdCookieNode[item]) {
-                    cookiesArr.push(jdCookieNode[item])
-                }
-            })
-            if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
-        } else {
-            cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
-        }
-        console.log(`共${cookiesArr.length}个京东账号\n`)
-        resolve()
-    })
+    notify = $.isNode() ? require('./sendNotify') : '';
+    const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+    if ($.isNode()) {
+        Object.keys(jdCookieNode).forEach((item) => {
+            if (jdCookieNode[item]) {
+                cookiesArr.push(jdCookieNode[item])
+            }
+        })
+        if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
+    } else {
+        cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
+    }
+    console.log(`共${cookiesArr.length}个京东账号\n`)
 }
 
 function randomString(e) {
