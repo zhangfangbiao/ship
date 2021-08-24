@@ -1,36 +1,12 @@
-## 重要通知
-### 薄雷收淡雨，雌蜺映雄虹。云拥奇峰出，霞飞散绮红。
-
-Faker维护仓库，收集全网目前能正常使用的脚本。
+收集全网目前能正常使用的脚本。
 
 每日更新。
 
-[![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=shufflewzc&bg_color=30,e96443,904e95&title_color=fff&text_color=fff)](https://github.com/anuraghazra/github-readme-stats)
-
-
-
-
-
-【Faker集合仓库】
-ql repo https://ghproxy.com/https://github.com/shufflewzc/faker2.git "jd_|jx_|gua_|jddj_|getJDCookie" "activity|backUp" "^jd[^_]|USER|utils|ZooFaker_Necklace.js|JDJRValidator_Pure|sign_graphics_validate"
-
-【圈x订阅地址】
-
-https://ghproxy.com/https://raw.githubusercontent.com/shufflewzc/faker/main/qx.json
-
-【QX系列教程】
-https://www.notion.so/Quantumult-X-cd78c6ab616e4ebf947519b2dd690a0c
+【仓库】
+ql repo https://ghproxy.com/https://github.com/zhangfangbiao/ship.git "jd_|jx_|gua_|jddj_|getJDCookie" "activity|backUp" "^jd[^_]|USER|utils|ZooFaker_Necklace.js|JDJRValidator_Pure|sign_graphics_validate"
 
 【青龙系列教程】
 https://www.notion.so/Cent-OS-7-6-1c598629675145988b43a37998a1604a
-
-
-* 防走丢:https://t.me/jdscrip
-
-
-维护收集不易，各位看官高兴可打赏下~
-
-![image](https://user-images.githubusercontent.com/15306294/125604796-955a078a-0e28-4900-9a1c-6fabdc8feb7d.png)
 
 
 ## Special statement:
