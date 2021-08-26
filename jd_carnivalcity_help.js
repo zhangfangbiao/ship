@@ -43,11 +43,9 @@ const JD_API_HOST = 'https://api.m.jd.com/api';
     return;
   }
   $.temp = [];
-  $.updatePkActivityIdRes = await getAuthorShareCode('https://raw.githubusercontent.com/Aaron-lv/updateTeam/master/shareCodes/jd_cityShareCodes.json')
-  if (!$.updatePkActivityIdRes) {
-    $.http.get({url: 'https://purge.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/jd_cityShareCodes.json'}).then((resp) => {}).catch((e) => $.log('刷新CDN异常', e));
-    await $.wait(1000)
-    $.updatePkActivityIdRes = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/jd_cityShareCodes.json')
+  $.updatePkActivityIdRes = await getAuthorShareCode('https://raw.githubusercontent.com/zhangfangbiao/sharecode/main/jd_carnivalcity_help.json')
+  if (!$updatePkActivityIdRes) {
+      $.updatePkActivityIdRes = await getAuthorShareCode('https://gitee.com/zhangfangbiao/sharecode/raw/main/jd_carnivalcity_help.json')
   }
   await requireConfig();
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -299,12 +297,12 @@ function shareCodesFormat() {
     // console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
     $.newShareCodes = [];
     if ($.shareCodesArr[$.index - 1]) {
-      $.newShareCodes = $.shareCodesArr[$.index - 1].split('@');
+      $.newShareCodes = $.shareCodesArr[$.index - 1].split('@').concat($.updatePkActivityIdRes || []);
     } else {
       console.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码\n`)
       const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
-      $.newShareCodes = inviteCodes[tempIndex] && inviteCodes[tempIndex].split('@') || [];
-      if ($.updatePkActivityIdRes && $.updatePkActivityIdRes.length) $.newShareCodes = [...$.updatePkActivityIdRes, ...$.newShareCodes];
+      $.newShareCodes = inviteCodes[tempIndex]?.split('@') || [];
+      if ($.updatePkActivityIdRes?.length) $.newShareCodes = [...$.updatePkActivityIdRes, ...$.newShareCodes];
     }
     // const readShareCodeRes = await readShareCode();
     // if (readShareCodeRes && readShareCodeRes.code === 200) {
