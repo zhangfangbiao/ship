@@ -21,6 +21,7 @@ let thiscookie = '', deviceid = '';
 let lat = '30.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let lng = '114.' + Math.round(Math.random() * (99999 - 10000) + 10000);
 let cityid = Math.round(Math.random() * (1500 - 1000) + 1000);
+const { getJddjCookie } = require('./utils/getJddjCookie')
 !(async () => {
     if (cookies.length == 0) {
         if ($.env.isNode) {
@@ -50,8 +51,7 @@ let cityid = Math.round(Math.random() * (1500 - 1000) + 1000);
 
         if (!thiscookie) continue;
 
-        deviceid = _uuid();
-        thiscookie = await taskLoginUrl(deviceid, thiscookie);
+        thiscookie = await getJddjCookie(thiscookie);
 
         await userinfo();
         await $.wait(1000);
@@ -237,47 +237,6 @@ function urlTask(url, body) {
         body: body + '&signKeyV1=' + cryptoContent
     };
     return option;
-}
-
-//根据京东ck获取到家ck
-async function taskLoginUrl(deviceid, thiscookie) {
-    return new Promise(async resolve => {
-        try {
-            let option = {
-                url: encodeURI('https://daojia.jd.com/client?_jdrandom=' + (+new Date()) + '&_funid_=login/treasure&functionId=login/treasure&body={}&lat=&lng=&lat_pos=&lng_pos=&city_id=&channel=h5&platform=6.6.0&platCode=h5&appVersion=6.6.0&appName=paidaojia&deviceModel=appmodel&isNeedDealError=false&traceId=' + deviceid + '&deviceToken=' + deviceid + '&deviceId=' + deviceid + '&_jdrandom=' + (+new Date()) + '&_funid_=login/treasure'),
-                headers: {
-                    "Cookie": 'deviceid_pdj_jd=' + deviceid + ';' + thiscookie + ';',
-                    "Host": "daojia.jd.com",
-                    'Content-Type': 'application/x-www-form-urlencoded;',
-                    "User-Agent": 'jdapp;iPhone;10.0.10;14.1;311fc185ed97a0392e35657dfe2a321664170965;network/wifi;model/iPhone11,6;appBuild/167764;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS 14_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1'
-                }
-            };
-            let ckstr = '';
-            await $.http.get(option).then(async response => {
-                if (response.body.indexOf('请求成功') > -1) {
-                    for (const key in response.headers) {
-                        if (key.toLowerCase().indexOf('cookie') > -1) {
-                            ckstr = response.headers[key].toString();
-                        }
-                    }
-                    ckstr += 'deviceid_pdj_jd=' + deviceid;
-                }
-            });
-            resolve(ckstr);
-
-        } catch (error) {
-            console.log(error);
-            resolve('');
-        }
-    })
-
-}
-
-function _uuid() {
-    function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
 /*********************************** API *************************************/
