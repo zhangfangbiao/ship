@@ -50,7 +50,7 @@ const JD_API_HOST = `https://api.m.jd.com`;
         });
         return;
     }
-    console.log("默认为号1开包/助力,号1为作者助力")
+    console.log("默认为号1开包/助力")
     message = ''
     $.helptype = 1
     $.needhelp = true
@@ -258,7 +258,7 @@ function open() {
 function getauthorid() {
     return new Promise(async (resolve) => {
         let options = {
-            url: "https://cdn.jsdelivr.net/gh/Wenmoux/scripts@wen/code/dyj.json",
+            url: "https://raw.githubusercontent.com/zhangfangbiao/sharecode/main/jd_fcdyj.json",
             headers: {}
         }
         $.get(options, async (err, resp, data) => {
@@ -269,7 +269,6 @@ function getauthorid() {
                 } else {
                     data = JSON.parse(data);
                     if (data) {
-                        console.log(`获取作者🐎成功 ${data.rid}`)
                         $.authorid = data.rid
                         $.authorinviter = data.inviter
                     }
