@@ -69,31 +69,37 @@ const JD_API_HOST = 'https://api.m.jd.com/api';
             await showMsg();
         }
     }
-    for (let v = 0; v < cookiesArr.length; v++) {
-        cookie = cookiesArr[v];
-        $.index = v + 1;
+    for (let i = 0; i < cookiesArr.length; i++) {
+        cookie = cookiesArr[i];
+        $.index = i + 1;
         $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
         $.canHelp = true;
         $.redPacketId = [...new Set($.redPacketId)];
         if (cookiesArr && cookiesArr.length >= 2) {
             console.log(`\n\n自己账号内部互助`);
-            for (let item of $.redPacketId) {
-                console.log(`账号 ${$.index} ${$.UserName} 开始给 ${item} 进行助力`)
-                await jinli_h5assist(item);
-                if (!$.canHelp) {
-                    console.log(`次数已用完或活动火爆，跳出助力`)
-                    break
+            for (let j = 0; j < $.redPacketId.length && $.canHelp; j++) {
+                console.log(`账号 ${$.index} ${$.UserName} 开始给 ${$.redPacketId[j]} 进行助力`)
+                $.max = false;
+                await jinli_h5assist($.redPacketId[j]);
+                await $.wait(2000)
+                if ($.max) {
+                    $.redPacketId.splice(j, 1)
+                    j--
+                    continue
                 }
             }
         }
-        if ($.canHelp) {
+        if ($.canHelp && $.authorMyShareIds?.length) {
             console.log(`\n\n有剩余助力机会则给作者进行助力`);
-            for (let item of $.authorMyShareIds || []) {
-                console.log(`\n账号 ${$.index} ${$.UserName} 开始给作者 ${item} 进行助力`)
-                await jinli_h5assist(item);
-                if (!$.canHelp) {
-                    console.log(`次数已用完，跳出助力`)
-                    break
+            for (let j = 0; j < $.canHelp; j++) {
+                console.log(`\n账号 ${$.index} ${$.UserName} 开始给作者 ${$.authorMyShareIds[j]} 进行助力`)
+                $.max = false;
+                await jinli_h5assist($.authorMyShareIds[j]);
+                await $.wait(2000)
+                if ($.max) {
+                    $.authorMyShareIds.splice(j, 1)
+                    j--
+                    continue
                 }
             }
         }
@@ -174,7 +180,7 @@ function doLuckDrawEntrance() {
     })
 }
 async function doTask() {
-    if ($.taskHomePageData && $.taskHomePageData.code === 0) {
+    if ($.taskHomePageData?.code === 0) {
         $.taskInfo = $.taskHomePageData.data.result.taskInfos;
         if ($.taskInfo && $.taskInfo.length > 0) {
             console.log(`    任务     状态  红包是否领取`);
@@ -228,7 +234,7 @@ async function red() {
     $.hasSendNumber = 0;
     $.assistants = 0;
     $.waitOpenTimes = 0;
-    if ($.h5activityIndex && $.h5activityIndex.data && $.h5activityIndex.data['result']) {
+    if ($.h5activityIndex?.data?.result) {
         const rewards = $.h5activityIndex['data']['result']['rewards'] || [];
         $.hasSendNumber = $.h5activityIndex['data']['result']['hasSendNumber'];
         if ($.h5activityIndex['data']['result']['redpacketConfigFillRewardInfo']) {
@@ -241,10 +247,10 @@ async function red() {
             }
         }
     }
-    if ($.h5activityIndex && $.h5activityIndex.data && $.h5activityIndex.data['biz_code'] === 10002) {
+    if ($.h5activityIndex?.data?.biz_code === 10002) {
         //可发起拆红包活动
         await h5launch();
-    } else if ($.h5activityIndex && $.h5activityIndex.data && $.h5activityIndex.data['biz_code'] === 20001) {
+    } else if ($.h5activityIndex?.data?.biz_code === 20001) {
         //20001:红包活动正在进行，可拆
         const redPacketId = $.h5activityIndex['data']['result']['redpacketInfo']['id'];
         if (redPacketId) $.redPacketId.push(redPacketId);
@@ -409,6 +415,7 @@ function jinli_h5assist(redPacketId) {
                     if (data && data.data && data.data['biz_code'] === 0) {
                         // status ,0:助力成功，1:不能重复助力，3:助力次数耗尽，8:不能为自己助力
                         console.log(`助力结果：${data['data']['result']['statusDesc']}`)
+                        if (data.data.result.status === 2) $.max = true;
                         if (data['data']['result']['status'] === 3) $.canHelp = false;
                         if (data['data']['result']['status'] === 9) $.canHelp = false;
                     } else {
