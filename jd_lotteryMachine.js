@@ -26,9 +26,9 @@ $.allShareId = {};
 main();
 async function main() {
     await help();//先账号内部互助
-
-    await updateShareCodes();
-    if (!$.body) await updateShareCodesCDN();
+    
+    // 做任务
+    if (!$.body) await getCodes();
     if ($.body) {
         eval($.body);
     }
@@ -217,41 +217,7 @@ function harmony_collectScore(timeout = 0) {
     })
 }
 
-function updateShareCodes(url = 'https://raw.githubusercontent.com/yangtingxiao/QuantumultX/master/scripts/jd/jd_lotteryMachine.js') {
-    return new Promise(resolve => {
-        const options = {
-            url: `${url}?${Date.now()}`, "timeout": 10000, headers: {
-                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-            }
-        };
-        if ($.isNode() && process.env.TG_PROXY_HOST && process.env.TG_PROXY_PORT) {
-            const tunnel = require("tunnel");
-            const agent = {
-                https: tunnel.httpsOverHttp({
-                    proxy: {
-                        host: process.env.TG_PROXY_HOST,
-                        port: process.env.TG_PROXY_PORT * 1
-                    }
-                })
-            }
-            Object.assign(options, { agent })
-        }
-        $.get(options, async (err, resp, data) => {
-            try {
-                if (err) {
-                    console.log(`请求访问 【raw.githubusercontent.com】 的jd_lotteryMachine.js文件失败：${JSON.stringify(err)}\n\n下面使用 【cdn.jsdelivr.net】请求访问jd_lotteryMachine.js文件`)
-                } else {
-                    $.body = data;
-                }
-            } catch (e) {
-                $.logErr(e, resp)
-            } finally {
-                resolve();
-            }
-        })
-    })
-}
-function updateShareCodesCDN(url = 'https://raw.githubusercontent.com/zhangfangbiao/sharecode/main/jd_lotteryMachine_cloud.js') {
+function getCodes(url = 'https://raw.githubusercontent.com/zhangfangbiao/sharecode/main/jd_lotteryMachine_cloud.js') {
     return new Promise(async resolve => {
         $.get({ url: `${url}?${Date.now()}`, timeout: 10000 }, async (err, resp, data) => {
             try {
@@ -266,7 +232,7 @@ function updateShareCodesCDN(url = 'https://raw.githubusercontent.com/zhangfangb
                 if (chinaUrl === url) {
                     resolve()
                 } else {
-                    updateShareCodesCDN(chinaUrl)
+                    getCodes(chinaUrl)
                 }
             }
         })
