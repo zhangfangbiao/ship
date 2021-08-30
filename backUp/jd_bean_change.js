@@ -21,9 +21,9 @@ cron "2 9 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_
 京东资产变动通知 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_bean_change.js, cronexpr="2 9 * * *", timeout=3600, enable=true
  */
 const $ = new Env('京东资产变动通知');
-const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('../sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
-const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+const jdCookieNode = $.isNode() ? require('../jdCookie.js') : '';
 let allMessage = '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
@@ -158,7 +158,7 @@ function TotalBean() {
         Accept: "*/*",
         Connection: "keep-alive",
         Cookie: cookie,
-        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('../USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
         "Accept-Language": "zh-cn",
         "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
         "Accept-Encoding": "gzip, deflate, br"
@@ -199,7 +199,7 @@ function getJingBeanBalanceDetail(page) {
       "url": `https://api.m.jd.com/client.action?functionId=getJingBeanBalanceDetail`,
       "body": `body=${escape(JSON.stringify({"pageSize": "20", "page": page.toString()}))}&appid=ld`,
       "headers": {
-        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('../USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
         'Host': 'api.m.jd.com',
         'Content-Type': 'application/x-www-form-urlencoded',
         'Cookie': cookie,
@@ -285,7 +285,7 @@ function redPacket() {
         'Referer': 'https://st.jingxi.com/my/redpacket.shtml?newPg=App&jxsid=16156262265849285961',
         'Accept-Encoding': 'gzip, deflate, br',
         "Cookie": cookie,
-        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('../USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
       }
     }
     $.get(options, (err, resp, data) => {
