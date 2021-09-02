@@ -18,7 +18,7 @@ ck1满10人自动换ck2
 如需执行脚本请设置环境变量
 guaopencard20="true"
 ————————————————
-入口：[8.31-9.21 中秋酒水 (https://lzdz1-isv.isvjcloud.com/dingzhi/jddrinks/grandceremony/activity/1988328?activityId=dz2108100001566301&shareUuid=1644bc91f825400a856e4d2a15f311af)]
+入口：[8.31-9.21 中秋酒水 (https://lzdz1-isv.isvjcloud.com/dingzhi/jddrinks/grandceremony/activity/1988328?activityId=dz2108100001566301&shareUuid=c4dadfe53c1a483990b8a468f475d3c2)]
 
 ============Quantumultx===============
 [task_local]
@@ -190,7 +190,7 @@ async function run() {
             console.log('账号1获取不到[shareUuid]退出执行，请重新执行')
             return
         }
-        if ($.index === 1 || $.shareUuid == '1644bc91f825400a856e4d2a15f311af') updateShareUuid($.shareUuid, 0)
+        if ($.index === 1 || $.shareUuid == 'c4dadfe53c1a483990b8a468f475d3c2') updateShareUuid($.shareUuid, 0)
         if ((!$.info.followShop || !checkOpenCardData.allOpenCard) && $.index !== 1) updateShareUuid($.shareUuid, 1)
         await $.wait(parseInt(Math.random() * 1000 + 5000, 10))
     } catch (e) {
