@@ -47,7 +47,7 @@ const JD_API_HOST = 'https://api.m.jd.com/api';
     if (!res) {
         res = await getAuthorShareCode('https://gitee.com/zhangfangbiao/sharecode/raw/main/jd_redPacket.json')
     }
-    $.authorMyShareIds = [...(res || [])];
+    $.authorMyShareIds = [...(res && [res[Math.floor((Math.random() * res.length))]] || []),...(res2 || [])];
     for (let i = 0; i < cookiesArr.length; i++) {
         if (cookiesArr[i]) {
             cookie = cookiesArr[i];

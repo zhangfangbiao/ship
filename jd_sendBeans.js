@@ -1,20 +1,10 @@
 /*
-送豆得豆
-活动入口：来客有礼小程序
-已支持IOS双京东账号,Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-============Quantumultx===============
-[task_local]
-#送豆得豆
-45 1,12 * * * https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_sendBeans.js, tag=送豆得豆, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
-================Loon==============
-[Script]
-cron "45 1,12 * * *" script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_sendBeans.js,tag=送豆得豆
-===============Surge=================
-送豆得豆 = type=cron,cronexp="45 1,12 * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_sendBeans.js
-============小火箭=========
-送豆得豆 = type=cron,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_sendBeans.js, cronexpr="45 1,12 * * *", timeout=3600, enable=true
- */
+ * 送豆得豆
+ * 至少需要6个ck
+ * 入口：京东APP->领京豆->送豆得豆
+ * 优先账号内互助，然后再助力【zero205】
+cron 45 0-23/6 * * *  https://raw.githubusercontent.com/zero205/JD_tencent_scf/main/jd_sddd.js
+*/
 const $ = new Env('送豆得豆');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -37,13 +27,29 @@ if ($.isNode()) {
   $.activityId = '';
   $.completeNumbers = '';
   console.log(`开始获取活动信息`);
+  for (let i = 0; i < cookiesArr.length; i++) {
+    $.cookie = cookiesArr[i];
+    $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
+    $.index = i + 1;
+    $.isLogin = true;
+    $.nickName = ''
+    await TotalBean();
+    $.isLoginInfo[$.UserName] = $.isLogin;
+    if (!$.isLogin) {
+      $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+      if ($.isNode()) {
+        await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+      }
+      continue;
+    }
+    await myReward()
+  }
   for (let i = 0; (cookiesArr.length < 3 ? i < cookiesArr.length : i < 3) && $.activityId === ''; i++) {
     $.cookie = cookiesArr[i];
     $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
     $.isLogin = true;
     $.nickName = ''
-    await TotalBean();
-    if (!$.isLogin) continue
+    if (!$.isLoginInfo[$.UserName]) continue;
     await getActivityInfo();
   }
   if ($.activityId === '') {
@@ -60,9 +66,20 @@ if ($.isNode()) {
     $.index = i + 1;
     $.isLogin = true;
     $.nickName = '';
-    await TotalBean();
-    console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
-    if (!$.isLogin) continue
+    if (!$.isLoginInfo[$.UserName]) {
+      await TotalBean();
+      console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
+      $.isLoginInfo[$.UserName] = $.isLogin;
+      if (!$.isLogin) {
+        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+        if ($.isNode()) {
+          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+        }
+        continue;
+      }
+    } else {
+      console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
+    }
     await openTuan();
   }
   console.log('\n开团信息\n'+JSON.stringify($.openTuanList));
@@ -73,41 +90,92 @@ if ($.isNode()) {
     $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
     $.index = i + 1;
     $.isLogin = true;
-    await TotalBean();
-    $.isLoginInfo[$.UserName] = $.isLogin;
-    console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}*****\n`);
-    if (!$.isLogin) {
-      $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-      if ($.isNode()) {
-        await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+    if(!$.isLoginInfo[$.UserName]){
+      await TotalBean();
+      $.isLoginInfo[$.UserName] = $.isLogin;
+      if (!$.isLogin) {
+        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+        if ($.isNode()) {
+          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+        }
+        continue;
       }
-      continue;
     }
     await helpMain();
   }
+  await getAuthorShareCode()
+  if ($.authorCode && $.authorCode.length) {
+  console.log(`\n开始帮【zero205】助力，感谢！\n`);
+  for (let i = 0; i < cookiesArr.length; i++) {
+    cookie = cookiesArr[i];
+    $.UserName = decodeURIComponent($.cookie.match(/pt_pin=(.+?);/) && $.cookie.match(/pt_pin=(.+?);/)[1])
+    $.index = i + 1;
+    $.isLogin = true;
+    $.canHelp = true;
+    $.oneTuanInfo = $.authorCode[i];
+    if ($.oneTuanInfo['completed']) {
+      continue;
+    }
+    console.log(`${$.UserName}去助力${$.oneTuanInfo['user']}`);
+    $.detail = {};
+    $.rewardRecordId = '';
+    await getActivityDetail();
+    if (JSON.stringify($.detail) === '{}') {
+      console.log(`获取活动详情失败`);
+      return;
+    } else {
+      $.rewardRecordId = $.detail.rewardRecordId;
+      console.log(`获取活动详情成功`);
+    }
+    await $.wait(3000);
+    await help();
+    await $.wait(2000);
+  }
+}
   console.log(`\n开始领取奖励\n`);
   for (let i = 0; i < cookiesArr.length && i < openCount; i++) {
     $.cookie = cookiesArr[i];
     $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
     $.index = i + 1;
     $.isLogin = true;
+    if(!$.isLoginInfo[$.UserName]){
+      await TotalBean();
+      $.isLoginInfo[$.UserName] = $.isLogin;
+      if (!$.isLogin) {
+        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+        if ($.isNode()) {
+          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+        }
+        continue;
+      }
+    }
     console.log(`\n*****开始【京东账号${$.index}】${$.UserName}*****\n`);
-    if (!$.isLoginInfo[$.UserName]) continue
     await rewardMain();
   }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    $.cookie = cookiesArr[i];
-    $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-    $.index = i + 1;
-    $.isLogin = true;
-    $.nickName = ''
-    await TotalBean();
-    console.log(`\n*****开始【京东账号${$.index}】${$.UserName}*****\n`);
-    if (!$.isLogin) continue
-    await myReward()
-  }
 })().catch((e) => {$.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')}).finally(() => {$.done();});
-
+async function getAuthorShareCode() {
+    return new Promise(resolve => {
+        $.get({
+            url: "https://raw.fastgit.org/zero205/updateTeam/main/shareCodes/sd.json",
+            headers: {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
+            }
+        }, async (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log(`${JSON.stringify(err)}`);
+                    console.log(`${$.name} API请求失败，请检查网路重试`);
+                } else {
+                    $.authorCode = JSON.parse(data);
+                }
+            } catch (e) {
+                $.logErr(e, resp)
+            } finally {
+                resolve();
+            }
+        })
+    })
+}
 async function getActivityInfo(){
   $.activityList = [];
   await getActivityList();
@@ -159,17 +227,14 @@ async function myReward(){
       try {
         data = JSON.parse(data);
         if (data.success) {
-          let canReward = false
           for (let key of Object.keys(data.datas)) {
             let vo = data.datas[key]
             if (vo.status === 3 && vo.type === 2) {
-              canReward = true
               $.rewardRecordId = vo.id
               await rewardBean()
               $.rewardRecordId = ''
             }
           }
-          if (!canReward) console.log(`没有可领取奖励`)
         }else{
           console.log(JSON.stringify(data));
         }
@@ -374,11 +439,11 @@ async function help() {
       try {
         if (res) {
           res = JSON.parse(res);
-          if(res.data.result === 5){
-            $.oneTuanInfo['completed'] = true;
-          }else if(res.data.result === 0 || res.data.result === 1){
-            $.canHelp = false;
-          }
+          // if(res.data.result === 5){
+          //   $.oneTuanInfo['completed'] = true;
+          // }else if(res.data.result === 0 || res.data.result === 1){
+          //   $.canHelp = false;
+          // }
           console.log(JSON.stringify(res));
         }
       } catch (e) {
